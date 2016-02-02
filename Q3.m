@@ -80,9 +80,23 @@ end
 figure;
 subplot(2,2,1)
 plot(ResidentialAMRS(:,1), Residential_Saving, 'o')
-xlabel('AMRS');
+xlabel('AMR');
 ylabel('Savings');
 
+%removing nans
+ResidentialAMRS_new = [];
+Residential_Saving_new = [];
+for ivx = 1:size(Residential_Saving,1)
+    if ~isnan(Residential_Saving(ivx,1)) && ~isnan(ResidentialAMRS(ivx,1))
+        ResidentialAMRS_new = [ResidentialAMRS_new;ResidentialAMRS(ivx,1)] ;
+        Residential_Saving_new = [Residential_Saving_new;Residential_Saving(ivx,1)];
+    end
+end
+fitResults = fit(ResidentialAMRS_new,Residential_Saving_new,'poly1');
+plot(fitResults,ResidentialAMRS_new,Residential_Saving_new)
+xlabel('Automatic Meter Readers Installed');
+ylabel('Total Energy Savings (MW)');
+print('AMR-S.png', '-dpng', '-r300')
 
 subplot(2,2,2)
 plot(ResidentialAMRS(:,2), Residential_Saving, 'o')
@@ -150,7 +164,15 @@ end
 fitResults = fit(ResidentialDemand_new,ResidentialPeakSaving_new,'poly1');
 plot(fitResults,ResidentialDemand_new,ResidentialPeakSaving_new)
 
-
+% boxplot
+[B, Ix] = sort(ResidentialDemand);
+B2 = Residential_PeakSaving(Ix);
+Breshape = reshape(B2(:,1), 71,10);
+Bquantile = quantile(B(:,1), [0:.1:1]);
+boxplot(Breshape)
+xlabel('Demand Response Customers Enrolled');
+ylabel('Peak Savings (MW)');
+print('DR-PS.png', '-dpng', '-r300')
 %COMMERCIAL PLOTS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Commercial plots
 
